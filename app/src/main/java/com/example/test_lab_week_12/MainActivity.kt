@@ -6,6 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
+import kotlinx.coroutines.launch
 import com.google.android.material.snackbar.Snackbar
 import java.util.Calendar
 import com.example.test_lab_week_12.model.Movie
@@ -36,18 +40,23 @@ class MainActivity : AppCompatActivity() {
             }
         )[MovieViewModel::class.java]
 
-        movieViewModel.popularMovies.observe(this) { popularMovies ->
-            val currentYear = Calendar.getInstance().get(Calendar.YEAR).toString()
-            movieAdapter.addMovies(
-                popularMovies
-                    .filter { it.releaseDate?.startsWith(currentYear) == true }
-                    .sortedByDescending { it.popularity }
-            )
-        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    movieViewModel.popularMovies.collect { movies ->
+                        movieAdapter.addMovies(movies)
+                    }
+                }
 
-        movieViewModel.error.observe(this) { error ->
-            if (error.isNotEmpty()) {
-                Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show()
+                launch {
+                    movieViewModel.error.collect { error ->
+                        if (error.isNotEmpty()) {
+                            Snackbar
+                                .make(recyclerView, error, Snackbar.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                }
             }
         }
     }
