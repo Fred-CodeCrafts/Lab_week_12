@@ -7,7 +7,7 @@ import com.example.test_lab_week_12.model.Movie
 
 class MovieRepository(private val movieService: MovieService) {
 
-    private val apiKey = "YOUR_API_KEY_HERE"
+    private val apiKey = "6e18febbf61a38c3ad00ac18076ff440"
 
     private val movieLiveData = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>>
