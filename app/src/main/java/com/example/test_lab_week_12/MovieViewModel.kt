@@ -35,7 +35,7 @@ class MovieViewModel(private val movieRepository: MovieRepository) : ViewModel()
                         .filter { movie ->
                             movie.releaseDate?.startsWith(currentYear) == true
                         }
-                        .sortedByDescending { it.popularity }
+                        .sortedWith(compareByDescending { it.popularity })
                 }
                 .catch { e ->
                     _error.value = "An exception occurred: ${e.message}"
